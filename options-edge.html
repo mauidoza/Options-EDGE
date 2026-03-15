@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OPTIONS EDGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --s1: #0f0f1a;
+  --s2: #161624;
+  --s3: #1e1e30;
+  --border: #252538;
+  --border2: #32324a;
+  --accent: #ff4500;
+  --accent-dim: rgba(255,69,0,0.15);
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0,229,255,0.1);
+  --green: #00ff88;
+  --green-dim: rgba(0,255,136,0.1);
+  --red: #ff3355;
+  --red-dim: rgba(255,51,85,0.1);
+  --yellow: #ffd600;
+  --yellow-dim: rgba(255,214,0,0.1);
+  --purple: #b088ff;
+  --text: #e0e0f0;
+  --muted: #5a5a7a;
+  --muted2: #3a3a55;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --radius: 8px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--display);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Noise texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ===== HEADER ===== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8,8,16,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.logo span { color: var(--accent); }
+
+.header-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: right;
+  line-height: 1.6;
+}
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  position: sticky;
+  top: 57px;
+  z-index: 99;
+}
+
+.tab-btn {
+  padding: 13px 8px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.tab-btn.active {
+  color: var(--cyan);
+  border-bottom-color: var(--cyan);
+}
+
+/* ===== MAIN CONTENT ===== */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ===== SCANNER VIEW ===== */
+.scanner-wrap {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-head {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.card-body { padding: 16px; }
+
+/* Ticker grid */
+.ticker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ticker-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ticker-slot label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.ticker-input {
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 11px 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.ticker-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+.ticker-input::placeholder { color: var(--muted2); font-size: 12px; letter-spacing: 1px; }
+
+/* Strategy count */
+.strategy-count-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.strategy-count-row label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.seg-control {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 8px 4px;
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.seg-btn.active {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* Scan options */
+.scan-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.toggle-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  transition: all 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.toggle-pill.active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: var(--cyan-dim);
+}
+.toggle-pill .pill-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted2);
+  transition: background 0.15s;
+}
+.toggle-pill.active .pill-dot { background: var(--cyan); }
+
+/* BIG SCAN BUTTON */
+.scan-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  -webkit-appearance: none;
+}
+.scan-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+}
+.scan-btn:active { transform: scale(0.98); }
+.scan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Loading state */
+.loading-overlay {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 48px 24px;
+  text-align: center;
+}
+.loading-overlay.active { display: flex; }
+
+.loader-ring {
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-status {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 280px;
+}
+.loading-ticker {
+  font-size: 14px;
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+/* ===== RESULTS ===== */
+.results-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Ticker Section */
+.ticker-section {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.ticker-section-header {
+  padding: 14px 16px;
+  background: var(--s2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.ticker-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.ticker-price {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ticker-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+/* Strategy cards */
+.strategy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.strategy-card {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.strategy-card:last-child { border-bottom: none; }
+.strategy-card:active { background: var(--s3); }
+.strategy-card.expanded { background: var(--s3); }
+
+.strategy-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.strategy-rank {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+.strategy-name {
+  font-size: 15px;
+  font-weight: 700;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.grade-badge {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.grade-badge.A { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+.grade-badge.B { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,229,255,0.3); }
+.grade-badge.C { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+.grade-badge.D { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,51,85,0.3); }
+
+.strategy-summary {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a0a0c0;
+  margin-bottom: 12px;
+}
+
+.strategy-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.tag.green { background: var(--green-dim); color: var(--green); }
+.tag.cyan { background: var(--cyan-dim); color: var(--cyan); }
+.tag.yellow { background: var(--yellow-dim); color: var(--yellow); }
+.tag.red { background: var(--red-dim); color: var(--red); }
+.tag.purple { background: rgba(176,136,255,0.1); color: var(--purple); }
+.tag.muted { background: var(--s3); color: var(--muted); }
+
+.strategy-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.metric-mini {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+.metric-mini-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.metric-mini-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Expanded detail */
+.strategy-detail {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.strategy-detail.open { display: flex; }
+
+.detail-section-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.greeks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.greek-item {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+}
+.greek-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.greek-val {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+}
+.greek-interp {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.risk-reward-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.rr-track {
+  flex: 1;
+  height: 8px;
+  background: var(--s2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rr-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+}
+
+.action-strip {
+  background: var(--accent-dim);
+  border: 1px solid rgba(255,69,0,0.3);
+  border-radius: 6px;
+  padding: 12px;
+}
+.action-strip-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.action-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  line-height: 2;
+  display: flex;
+  gap: 8px;
+}
+.action-item span:first-child { color: var(--accent); }
+
+.expand-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding-top: 4px;
+  transition: color 0.15s;
+}
+.expand-chevron svg {
+  transition: transform 0.2s;
+}
+.strategy-card.expanded .expand-chevron svg { transform: rotate(180deg); }
+.strategy-card.expanded .expand-chevron { color: var(--cyan); }
+
+/* ===== MANUAL ANALYZER TAB ===== */
+.analyzer-wrap {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Input fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.field input, .field select {
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+.field input::placeholder { color: var(--muted2); }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+/* Contract block */
+.contract-block {
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px;
+  position: relative;
+}
+.contract-block-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.remove-contract-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  background: var(--red-dim);
+  border: 1px solid rgba(255,51,85,0.2);
+  border-radius: 4px;
+  color: var(--red);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-contract-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.add-contract-btn:active { border-color: var(--cyan); color: var(--cyan); }
+
+.analyze-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  -webkit-appearance: none;
+  transition: all 0.15s;
+}
+.analyze-btn:active { transform: scale(0.98); }
+
+/* Analysis results */
+.analysis-result {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+.analysis-result.show { display: flex; }
+
+.score-banner {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.score-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.score-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.score-num {
+  font-family: var(--mono);
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 70px;
+  text-align: center;
+}
+.score-info { flex: 1; }
+.score-contract-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.score-verdict { font-family: var(--mono); font-size: 10px; line-height: 1.6; color: var(--muted); }
+
+.verdict-banner {
+  padding: 14px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+  margin-top: 12px;
+}
+.verdict-banner.go { background: var(--green-dim); border-left: 3px solid var(--green); color: var(--green); }
+.verdict-banner.caution { background: var(--yellow-dim); border-left: 3px solid var(--yellow); color: var(--yellow); }
+.verdict-banner.pass { background: var(--red-dim); border-left: 3px solid var(--red); color: var(--red); }
+
+/* Factor details */
+.factor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.factor-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+}
+.factor-card.full { grid-column: 1 / -1; }
+.factor-card-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.factor-card-val {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.factor-card-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Flags & positives */
+.flag-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.flag-item:last-child { border-bottom: none; }
+
+/* IV bar */
+.iv-bar-wrap {
+  position: relative;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 50%, var(--red) 100%);
+  margin: 10px 0 6px;
+  opacity: 0.75;
+}
+.iv-needle {
+  position: absolute;
+  top: -5px;
+  width: 3px;
+  height: 30px;
+  background: white;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(255,255,255,0.9);
+}
+.iv-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+}
+
+/* Progress bar */
+.prog-bar {
+  height: 4px;
+  background: var(--s3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.prog-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Playbook */
+.playbook-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.playbook-header {
+  padding: 14px 16px;
+  background: var(--s2);
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.playbook-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rule-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.rule-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  padding-top: 2px;
+  min-width: 20px;
+}
+.rule-body { font-size: 13px; line-height: 1.6; color: #b0b0cc; }
+.rule-body strong { color: var(--cyan); font-weight: 600; }
+.rule-body .warn { color: var(--yellow); }
+.rule-body .danger { color: var(--red); }
+
+/* Disclaimer banner */
+.disclaimer {
+  background: rgba(255,69,0,0.06);
+  border-top: 1px solid rgba(255,69,0,0.2);
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Bottom safe area spacer */
+.safe-spacer {
+  height: calc(16px + var(--safe-bottom));
+}
+
+/* Comparison table - mobile */
+.compare-table {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.compare-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  padding: 10px 12px;
+}
+.compare-row.header {
+  background: var(--s2);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.compare-row:last-child { border-bottom: none; }
+.compare-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.compare-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Utility */
+.color-green { color: var(--green); }
+.color-yellow { color: var(--yellow); }
+.color-red { color: var(--red); }
+.color-cyan { color: var(--cyan); }
+.color-muted { color: var(--muted); }
+
+.divider { height: 1px; background: var(--border); }
+
+/* Empty state */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.empty-icon { font-size: 36px; opacity: 0.3; }
+.empty-text { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; line-height: 1.8; }
+
+/* AI badge */
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(176,136,255,0.12);
+  border: 1px solid rgba(176,136,255,0.25);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--purple);
+}
+.ai-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--purple);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Smooth fade in for results */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fadeup { animation: fadeUp 0.3s ease forwards; }
+
+/* Horizontal scroll for wide tables */
+.hscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">OPTIONS<span>EDGE</span></div>
+  </div>
+  <div class="header-badge">
+    AI-POWERED<br><span style="color:var(--accent)">NOT FINANCIAL ADVICE</span>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('scanner')">⚡ AI SCANNER</button>
+  <button class="tab-btn" onclick="switchTab('analyzer')">📊 ANALYZER</button>
+</div>
+
+<!-- =================== SCANNER TAB =================== -->
+<div id="tab-scanner" class="tab-content active">
+  <div class="scanner-wrap">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">TICKER WATCHLIST</span>
+        <span class="ai-badge"><span class="ai-dot"></span> AI ANALYSIS</span>
+      </div>
+      <div class="card-body">
+        <div class="ticker-grid" id="ticker-grid">
+          <div class="ticker-slot">
+            <label>Ticker 1</label>
+            <input class="ticker-input scan-ticker" type="text" placeholder="PLTR" maxlength="6">
+          </div>
+          <div class="ticker-slot">
+            <label>Ticker 2</label>
+            <input class="ticker-input scan-ticker" type="text" placeholder="NVDA" maxlength="6">
+          </div>
+          <div class="ticker-slot">
+            <label>Ticker 3</label>
+            <input class="ticker-input scan-ticker" type="text" placeholder="TSLA" maxlength="6">
+          </div>
+          <div class="ticker-slot">
+            <label>Ticker 4</label>
+            <input class="ticker-input scan-ticker" type="text" placeholder="AAPL" maxlength="6">
+          </div>
+          <div class="ticker-slot">
+            <label>Ticker 5</label>
+            <input class="ticker-input scan-ticker" type="text" placeholder="SPY" maxlength="6">
+          </div>
+          <div class="ticker-slot">
+            <label>Ticker 6 (opt)</label>
+            <input class="ticker-input scan-ticker" type="text" placeholder="" maxlength="6">
+          </div>
+        </div>
+
+        <div class="strategy-count-row">
+          <label>STRATEGIES / TICKER</label>
+          <div class="seg-control" id="strat-count">
+            <button class="seg-btn" onclick="setStratCount(5, this)">5</button>
+            <button class="seg-btn active" onclick="setStratCount(7, this)">7</button>
+            <button class="seg-btn" onclick="setStratCount(10, this)">10</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <div class="section-head" style="margin-bottom:10px">FOCUS: STRATEGY TYPES</div>
+          <div class="scan-options" id="strategy-types">
+            <div class="toggle-pill active" data-type="earnings">
+              <span class="pill-dot"></span> EARNINGS PLAYS
+            </div>
+            <div class="toggle-pill active" data-type="momentum">
+              <span class="pill-dot"></span> MOMENTUM
+            </div>
+            <div class="toggle-pill active" data-type="iv_crush">
+              <span class="pill-dot"></span> IV CRUSH
+            </div>
+            <div class="toggle-pill" data-type="spreads">
+              <span class="pill-dot"></span> SPREADS
+            </div>
+            <div class="toggle-pill" data-type="leaps">
+              <span class="pill-dot"></span> LEAPS
+            </div>
+          </div>
+        </div>
+
+        <button class="scan-btn" id="scan-btn" onclick="runScan()">
+          ⚡ SCAN ALL TICKERS
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-overlay" id="scan-loading">
+      <div class="loader-ring"></div>
+      <div>
+        <div class="loading-ticker" id="loading-ticker-name">Initializing...</div>
+        <div class="loading-status" id="loading-status">
+          Connecting to AI analysis engine<br>Fetching live market context
+        </div>
+      </div>
+    </div>
+
+    <!-- Results inject here -->
+    <div id="scan-results"></div>
+
+  </div>
+  <div class="disclaimer">
+    ⚠ OPTIONS TRADING INVOLVES SUBSTANTIAL RISK OF LOSS. AI ANALYSIS IS FOR EDUCATIONAL PURPOSES ONLY AND DOES NOT CONSTITUTE FINANCIAL ADVICE. ALWAYS CONSULT A LICENSED FINANCIAL ADVISOR BEFORE TRADING.
+  </div>
+  <div class="safe-spacer"></div>
+</div>
+
+<!-- =================== ANALYZER TAB =================== -->
+<div id="tab-analyzer" class="tab-content">
+  <div class="analyzer-wrap">
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">MARKET CONTEXT</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+        <div class="field-row">
+          <div class="field">
+            <label>Ticker</label>
+            <input type="text" id="a-ticker" placeholder="PLTR" style="text-transform:uppercase;font-weight:700;letter-spacing:2px">
+          </div>
+          <div class="field">
+            <label>Stock Price ($)</label>
+            <input type="number" id="a-price" placeholder="150.96" step="0.01">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Days to Earnings</label>
+            <input type="number" id="a-dte-earn" placeholder="14" min="0">
+          </div>
+          <div class="field">
+            <label>Hist. Earnings Move (%)</label>
+            <input type="number" id="a-earn-move" placeholder="15" step="0.1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Market Sentiment</label>
+          <select id="a-sentiment">
+            <option value="bullish">Bullish — Strong catalyst expected</option>
+            <option value="neutral" selected>Neutral — No strong bias</option>
+            <option value="bearish">Bearish — Headwinds present</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">CONTRACTS</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+        <div id="a-contracts">
+          <!-- Contract A -->
+          <div class="contract-block" id="ac-0">
+            <div class="contract-block-label">CONTRACT A</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="field-row">
+                <div class="field"><label>Expiration</label><input type="text" class="ac-exp" placeholder="Apr 24"></div>
+                <div class="field"><label>DTE (Days)</label><input type="number" class="ac-dte" placeholder="40" min="1"></div>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Strike ($)</label><input type="number" class="ac-strike" placeholder="155" step="0.5"></div>
+                <div class="field"><label>Mark Price ($)</label><input type="number" class="ac-mark" placeholder="8.83" step="0.01"></div>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Bid ($)</label><input type="number" class="ac-bid" placeholder="8.75" step="0.01"></div>
+                <div class="field"><label>Ask ($)</label><input type="number" class="ac-ask" placeholder="8.90" step="0.01"></div>
+              </div>
+              <div class="field-row three">
+                <div class="field"><label>IV (%)</label><input type="number" class="ac-iv" placeholder="51.9" step="0.01"></div>
+                <div class="field"><label>IV Low (%)</label><input type="number" class="ac-iv-low" placeholder="41" step="0.1"></div>
+                <div class="field"><label>IV High (%)</label><input type="number" class="ac-iv-high" placeholder="109" step="0.1"></div>
+              </div>
+              <div class="field-row three">
+                <div class="field"><label>Delta</label><input type="number" class="ac-delta" placeholder="0.48" step="0.0001"></div>
+                <div class="field"><label>Theta</label><input type="number" class="ac-theta" placeholder="-0.136" step="0.0001"></div>
+                <div class="field"><label>Vega</label><input type="number" class="ac-vega" placeholder="0.199" step="0.0001"></div>
+              </div>
+              <div class="field-row">
+                <div class="field"><label>Volume</label><input type="number" class="ac-vol" placeholder="110"></div>
+                <div class="field"><label>Open Interest</label><input type="number" class="ac-oi" placeholder="528"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="add-contract-btn" onclick="addManualContract()">+ ADD CONTRACT</button>
+      </div>
+    </div>
+
+    <button class="analyze-btn" onclick="runManualAnalysis()">▶ RUN ANALYSIS</button>
+
+    <!-- Results -->
+    <div class="analysis-result" id="a-results">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Playbook -->
+    <div class="playbook-card">
+      <div class="playbook-header">📖 EARNINGS VOLATILITY PLAYBOOK</div>
+      <div class="playbook-body">
+        <div style="font-size:13px;line-height:1.7;color:#a0a0c0;margin-bottom:8px">Before earnings, implied volatility <strong style="color:var(--cyan)">rises consistently</strong>. After earnings, IV <strong style="color:var(--red)">collapses instantly</strong> (IV crush). The speculative call strategy exploits <em>pre-earnings IV expansion</em> — buy low IV, ride it higher into the event, exit <strong style="color:var(--yellow)">before the number drops.</strong></div>
+        <div class="divider"></div>
+        <div style="margin-top:12px;margin-bottom:6px;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--cyan)">THE 7 DECISION FACTORS</div>
+        <div class="rule-item"><div class="rule-num">01</div><div class="rule-body"><strong>IV Percentile</strong> — Buy below 40% of 52-week range. <span class="warn">Above 70% = avoid.</span></div></div>
+        <div class="rule-item"><div class="rule-num">02</div><div class="rule-body"><strong>Bid/Ask Spread</strong> — Below 5% of mark price. <span class="danger">Above 15% = red flag.</span></div></div>
+        <div class="rule-item"><div class="rule-num">03</div><div class="rule-body"><strong>DTE vs Earnings</strong> — Expire 7–14 days after earnings. <span class="warn">Expiring before = miss the catalyst.</span></div></div>
+        <div class="rule-item"><div class="rule-num">04</div><div class="rule-body"><strong>Vega/Theta Ratio</strong> — Above 1.0. <span class="warn">Below 1.0 = theta winning.</span></div></div>
+        <div class="rule-item"><div class="rule-num">05</div><div class="rule-body"><strong>Liquidity</strong> — OI &gt;500, Volume &gt;100 (soft mins).</div></div>
+        <div class="rule-item"><div class="rule-num">06</div><div class="rule-body"><strong>Strike Reachability</strong> — Within historical 1-SD earnings move.</div></div>
+        <div class="rule-item"><div class="rule-num">07</div><div class="rule-body"><strong>Exit Discipline</strong> — <span class="danger">SELL BEFORE EARNINGS PRINT.</span> Target 50–100% gain or day before earnings, whichever first.</div></div>
+        <div class="divider"></div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px">POSITION SIZING</div>
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-body">Max <strong>2–5% of portfolio</strong> per position. $21K portfolio = $420–$1,050 max.</div></div>
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-body"><strong>Hard stop at -50%</strong> of premium paid. No exceptions.</div></div>
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-body"><strong>Never hold through earnings</strong> on a naked long call.</div></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="disclaimer">
+    ⚠ OPTIONS TRADING INVOLVES SUBSTANTIAL RISK OF LOSS. FOR EDUCATIONAL PURPOSES ONLY.
+  </div>
+  <div class="safe-spacer"></div>
+</div>
+
+<script>
+// =================== CONFIG ===================
+const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
+let strategyCount = 7;
+let activeStrategyTypes = new Set(['earnings', 'momentum', 'iv_crush']);
+let manualContractCount = 1;
+
+// =================== TAB SWITCHING ===================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// =================== STRATEGY COUNT ===================
+function setStratCount(n, btn) {
+  strategyCount = n;
+  document.querySelectorAll('#strat-count .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// =================== TOGGLE PILLS ===================
+document.querySelectorAll('.toggle-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const type = pill.dataset.type;
+    pill.classList.toggle('active');
+    if (pill.classList.contains('active')) {
+      activeStrategyTypes.add(type);
+    } else {
+      activeStrategyTypes.delete(type);
+    }
+  });
+});
+
+// Uppercase ticker inputs
+document.querySelectorAll('.scan-ticker').forEach(input => {
+  input.addEventListener('input', () => { input.value = input.value.toUpperCase(); });
+});
+
+// =================== SCANNER ===================
+async function runScan() {
+  const tickers = Array.from(document.querySelectorAll('.scan-ticker'))
+    .map(i => i.value.trim().toUpperCase())
+    .filter(Boolean);
+
+  if (tickers.length === 0) {
+    alert('Enter at least one ticker symbol.');
+    return;
+  }
+
+  const scanBtn = document.getElementById('scan-btn');
+  const loading = document.getElementById('scan-loading');
+  const results = document.getElementById('scan-results');
+
+  scanBtn.disabled = true;
+  scanBtn.textContent = 'SCANNING...';
+  loading.classList.add('active');
+  results.innerHTML = '';
+
+  const typesArr = Array.from(activeStrategyTypes);
+  const allResults = [];
+
+  for (let i = 0; i < tickers.length; i++) {
+    const ticker = tickers[i];
+    document.getElementById('loading-ticker-name').textContent = ticker;
+    document.getElementById('loading-status').textContent =
+      `Analyzing ${ticker} (${i+1}/${tickers.length})\nFetching live options chain data…`;
+
+    try {
+      const data = await analyzeTickerWithAI(ticker, strategyCount, typesArr);
+      allResults.push({ ticker, data });
+    } catch (e) {
+      allResults.push({ ticker, error: e.message });
+    }
+  }
+
+  loading.classList.remove('active');
+  scanBtn.disabled = false;
+  scanBtn.textContent = '⚡ SCAN ALL TICKERS';
+
+  renderScanResults(allResults);
+}
+
+async function analyzeTickerWithAI(ticker, count, types) {
+  const prompt = `You are an expert options analyst. Analyze the stock ${ticker} and provide the top ${count} options strategies for the current week.
+
+Focus on these strategy types if applicable: ${types.join(', ')}.
+
+Use your knowledge of current market conditions, recent stock performance, and typical options chain characteristics for ${ticker}.
+
+For each strategy provide:
+1. Strategy name (specific, e.g. "ATM Call — Apr 24 Exp" or "Bull Call Spread $150/$160 — May 1")
+2. Strategy type (earnings_play, momentum, iv_crush_sell, spread, leap, etc.)
+3. A simple 2-sentence explanation a beginner can understand
+4. Overall grade: A, B, C, or D (A=excellent setup, B=good, C=marginal, D=avoid)
+5. Score: 0-100
+6. Key metrics (estimated/typical for this ticker):
+   - Estimated IV percentile (0-100)
+   - Estimated vega/theta ratio
+   - Estimated bid/ask spread %
+   - DTE (days to expiration, suggest specific)
+   - Strike price (suggest specific based on current known price)
+   - Estimated premium range ($)
+   - Max risk per contract ($)
+7. Risk level: LOW, MEDIUM, HIGH, VERY_HIGH
+8. Key tags (2-4 tags): e.g. EARNINGS_PLAY, HIGH_IV, TIGHT_SPREAD, LIQUID, ATM, OTM
+9. Detailed analysis (3-4 sentences covering greeks rationale, timing, risks, and exit strategy)
+10. Specific action steps (entry price, exit target, stop loss)
+11. One key risk to watch
+
+Also provide: current approximate stock price for ${ticker}, and upcoming earnings date if known.
+
+Respond ONLY with valid JSON, no markdown, no backticks:
+{
+  "ticker": "${ticker}",
+  "stockPrice": 150.00,
+  "earningsDate": "May 5, 2025 (est)" or null,
+  "marketNote": "brief 1-sentence market context",
+  "strategies": [
+    {
+      "rank": 1,
+      "name": "Strategy Name",
+      "type": "earnings_play",
+      "summary": "Simple 2-sentence explanation.",
+      "grade": "A",
+      "score": 82,
+      "ivPercentile": 35,
+      "vegaTheta": 1.47,
+      "spreadPct": 3.2,
+      "dte": 40,
+      "strike": 155,
+      "premiumRange": "8.50-9.00",
+      "maxRisk": 900,
+      "riskLevel": "MEDIUM",
+      "tags": ["EARNINGS_PLAY", "LOW_IV", "ATM"],
+      "detailedAnalysis": "Detailed 3-4 sentence analysis...",
+      "entry": "Limit order at $8.75 mark",
+      "exitTarget": "$15.00-17.50 (+75-100%) or day before earnings",
+      "stopLoss": "$4.50 (-50%)",
+      "keyRisk": "IV crush if entered too close to earnings"
+    }
+  ]
+}`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: 4000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || 'API error');
+  }
+
+  const raw = await response.json();
+
+  // Extract text from response (may include tool use blocks)
+  let text = '';
+  for (const block of raw.content) {
+    if (block.type === 'text') text += block.text;
+  }
+
+  // Parse JSON
+  const clean = text.replace(/```json|```/g, '').trim();
+  // Find JSON object
+  const start = clean.indexOf('{');
+  const end = clean.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('No JSON in response');
+  return JSON.parse(clean.slice(start, end + 1));
+}
+
+// =================== RENDER SCAN RESULTS ===================
+function renderScanResults(allResults) {
+  const container = document.getElementById('scan-results');
+  if (allResults.length === 0) { container.innerHTML = ''; return; }
+
+  let html = '';
+
+  allResults.forEach(({ ticker, data, error }) => {
+    if (error) {
+      html += `<div class="card fadeup" style="margin-bottom:0">
+        <div class="card-body">
+          <div class="empty-state">
+            <div class="empty-icon">⚠</div>
+            <div class="empty-text">${ticker}: ${error}</div>
+          </div>
+        </div>
+      </div>`;
+      return;
+    }
+
+    const priceStr = data.stockPrice ? `$${data.stockPrice.toFixed(2)}` : 'N/A';
+
+    html += `<div class="ticker-section fadeup">
+      <div class="ticker-section-header">
+        <div>
+          <div class="ticker-name">${data.ticker}</div>
+          <div class="ticker-meta">
+            <span class="tag cyan">${priceStr}</span>
+            ${data.earningsDate ? `<span class="tag yellow">EARN: ${data.earningsDate}</span>` : ''}
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);text-align:right;max-width:160px;line-height:1.5">${data.marketNote || ''}</div>
+      </div>
+      <div class="strategy-list">`;
+
+    (data.strategies || []).forEach((s, idx) => {
+      const gradeClass = s.grade || 'C';
+      html += `
+        <div class="strategy-card" id="sc-${ticker}-${idx}" onclick="toggleStrategy('sc-${ticker}-${idx}')">
+          <div class="strategy-top">
+            <div class="strategy-rank">#${s.rank || idx+1}</div>
+            <div>
+              <div class="strategy-name">${s.name}</div>
+            </div>
+            <div class="grade-badge ${gradeClass}">${gradeClass}</div>
+          </div>
+
+          <div class="strategy-summary">${s.summary}</div>
+
+          <div class="strategy-tags">
+            ${(s.tags || []).map(t => {
+              const cls = t.includes('EARN') ? 'yellow' : t.includes('LOW') ? 'green' : t.includes('HIGH') ? 'red' : 'cyan';
+              return `<span class="tag ${cls}">${t}</span>`;
+            }).join('')}
+            <span class="tag ${s.riskLevel === 'LOW' ? 'green' : s.riskLevel === 'MEDIUM' ? 'cyan' : s.riskLevel === 'HIGH' ? 'yellow' : 'red'}">${s.riskLevel} RISK</span>
+          </div>
+
+          <div class="strategy-metrics-row">
+            <div class="metric-mini">
+              <div class="metric-mini-label">SCORE</div>
+              <div class="metric-mini-val" style="color:${s.score >= 70 ? 'var(--green)' : s.score >= 50 ? 'var(--yellow)' : 'var(--red)'}">${s.score}/100</div>
+            </div>
+            <div class="metric-mini">
+              <div class="metric-mini-label">PREMIUM</div>
+              <div class="metric-mini-val" style="color:var(--cyan)">$${s.premiumRange || '—'}</div>
+            </div>
+            <div class="metric-mini">
+              <div class="metric-mini-label">MAX RISK</div>
+              <div class="metric-mini-val" style="color:var(--red)">$${s.maxRisk || '—'}</div>
+            </div>
+          </div>
+
+          <!-- Expandable Detail -->
+          <div class="strategy-detail" id="sd-${ticker}-${idx}">
+
+            <div>
+              <div class="detail-section-title">DEEP ANALYSIS</div>
+              <div style="font-size:13px;line-height:1.7;color:#b0b0cc">${s.detailedAnalysis}</div>
+            </div>
+
+            <div class="greeks-grid">
+              <div class="greek-item">
+                <div class="greek-label">IV PERCENTILE</div>
+                <div class="greek-val" style="color:${(s.ivPercentile||50) < 40 ? 'var(--green)' : (s.ivPercentile||50) < 65 ? 'var(--yellow)' : 'var(--red)'}">${s.ivPercentile || '—'}%</div>
+                <div class="greek-interp">${(s.ivPercentile||50) < 40 ? 'Low — good entry' : (s.ivPercentile||50) < 65 ? 'Moderate — some room' : 'High — crush risk'}</div>
+              </div>
+              <div class="greek-item">
+                <div class="greek-label">VEGA/THETA</div>
+                <div class="greek-val" style="color:${(s.vegaTheta||0) >= 1.5 ? 'var(--green)' : (s.vegaTheta||0) >= 1.0 ? 'var(--yellow)' : 'var(--red)'}">${s.vegaTheta ? s.vegaTheta.toFixed(2) : '—'}</div>
+                <div class="greek-interp">${(s.vegaTheta||0) >= 1.5 ? 'IV expansion dominates' : (s.vegaTheta||0) >= 1.0 ? 'Borderline — needs catalyst' : 'Theta winning'}</div>
+              </div>
+              <div class="greek-item">
+                <div class="greek-label">SPREAD %</div>
+                <div class="greek-val" style="color:${(s.spreadPct||99) < 5 ? 'var(--green)' : (s.spreadPct||99) < 10 ? 'var(--yellow)' : 'var(--red)'}">${s.spreadPct ? s.spreadPct.toFixed(1) + '%' : '—'}</div>
+                <div class="greek-interp">${(s.spreadPct||99) < 5 ? 'Tight — efficient entry' : (s.spreadPct||99) < 10 ? 'Use limit at mark' : 'Wide — limit order only'}</div>
+              </div>
+              <div class="greek-item">
+                <div class="greek-label">DTE / STRIKE</div>
+                <div class="greek-val" style="color:var(--text)">${s.dte}d / $${s.strike}</div>
+                <div class="greek-interp">Days to expiry / target strike</div>
+              </div>
+            </div>
+
+            <div class="action-strip">
+              <div class="action-strip-title">⚡ ACTION PLAN</div>
+              <div class="action-item"><span>ENTRY:</span><span>${s.entry}</span></div>
+              <div class="action-item"><span>TARGET:</span><span>${s.exitTarget}</span></div>
+              <div class="action-item"><span>STOP:</span><span>${s.stopLoss}</span></div>
+              <div class="action-item"><span style="color:var(--yellow)">RISK:</span><span style="color:var(--yellow)">${s.keyRisk}</span></div>
+            </div>
+
+          </div>
+
+          <div class="expand-chevron">
+            <span>TAP FOR FULL ANALYSIS</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function toggleStrategy(cardId) {
+  const card = document.getElementById(cardId);
+  const detailId = cardId.replace('sc-', 'sd-');
+  const detail = document.getElementById(detailId);
+  card.classList.toggle('expanded');
+  if (detail) detail.classList.toggle('open');
+}
+
+// =================== MANUAL ANALYZER ===================
+function addManualContract() {
+  if (manualContractCount >= 4) return;
+  const labels = ['A','B','C','D'];
+  const idx = manualContractCount;
+  const container = document.getElementById('a-contracts');
+  const div = document.createElement('div');
+  div.className = 'contract-block';
+  div.id = `ac-${idx}`;
+  div.style.marginTop = '12px';
+  div.innerHTML = `
+    <div class="contract-block-label">CONTRACT ${labels[idx]}</div>
+    <button class="remove-contract-btn" onclick="removeManualContract(${idx})">✕</button>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="field-row">
+        <div class="field"><label>Expiration</label><input type="text" class="ac-exp" placeholder="May 1"></div>
+        <div class="field"><label>DTE (Days)</label><input type="number" class="ac-dte" placeholder="47" min="1"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Strike ($)</label><input type="number" class="ac-strike" placeholder="155" step="0.5"></div>
+        <div class="field"><label>Mark Price ($)</label><input type="number" class="ac-mark" placeholder="9.83" step="0.01"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Bid ($)</label><input type="number" class="ac-bid" placeholder="8.95" step="0.01"></div>
+        <div class="field"><label>Ask ($)</label><input type="number" class="ac-ask" placeholder="10.70" step="0.01"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>IV (%)</label><input type="number" class="ac-iv" placeholder="52" step="0.01"></div>
+        <div class="field"><label>IV Low (%)</label><input type="number" class="ac-iv-low" placeholder="41" step="0.1"></div>
+        <div class="field"><label>IV High (%)</label><input type="number" class="ac-iv-high" placeholder="109" step="0.1"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>Delta</label><input type="number" class="ac-delta" placeholder="0.49" step="0.0001"></div>
+        <div class="field"><label>Theta</label><input type="number" class="ac-theta" placeholder="-0.127" step="0.0001"></div>
+        <div class="field"><label>Vega</label><input type="number" class="ac-vega" placeholder="0.216" step="0.0001"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Volume</label><input type="number" class="ac-vol" placeholder="20"></div>
+        <div class="field"><label>Open Interest</label><input type="number" class="ac-oi" placeholder="235"></div>
+      </div>
+    </div>`;
+  container.appendChild(div);
+  manualContractCount++;
+}
+
+function removeManualContract(idx) {
+  const el = document.getElementById(`ac-${idx}`);
+  if (el) el.remove();
+}
+
+function getNum(sel, parent) {
+  const el = parent.querySelector(sel);
+  return el ? parseFloat(el.value) || 0 : 0;
+}
+function getStr2(sel, parent) {
+  const el = parent.querySelector(sel);
+  return el ? el.value.trim() : '';
+}
+
+function ivPct(iv, low, high) {
+  if (high <= low) return 50;
+  return Math.round(((iv - low) / (high - low)) * 100);
+}
+
+function scoreContract(c, dte2earn, earnMove, price) {
+  let score = 0;
+  const flags = [], positives = [];
+  const spread = c.ask - c.bid;
+  const spreadPct = c.mark > 0 ? (spread / c.mark) * 100 : 999;
+  const ivP = ivPct(c.iv, c.ivLow, c.ivHigh);
+  const vt = c.theta !== 0 ? Math.abs(c.vega / c.theta) : 0;
+  const dteAfter = c.dte - dte2earn;
+
+  // IV Percentile (20)
+  if (ivP < 30) { score += 20; positives.push('IV extremely low — max expansion potential'); }
+  else if (ivP < 45) { score += 16; positives.push('IV in low range — good pre-earnings entry'); }
+  else if (ivP < 60) { score += 10; flags.push('IV moderate — limited expansion room'); }
+  else if (ivP < 75) { score += 4; flags.push('IV elevated — expansion may be priced in'); }
+  else { flags.push('IV near 52-week high — extreme crush risk'); }
+
+  // Spread (20)
+  if (spreadPct < 3) { score += 20; positives.push('Extremely tight spread'); }
+  else if (spreadPct < 5) { score += 16; positives.push('Tight spread — efficient entry'); }
+  else if (spreadPct < 10) { score += 9; flags.push(`Spread ${spreadPct.toFixed(1)}% — use limit at mark`); }
+  else if (spreadPct < 15) { score += 4; flags.push(`Wide spread ${spreadPct.toFixed(1)}%`); }
+  else { flags.push(`Very wide spread ${spreadPct.toFixed(1)}% — limit at bid`); }
+
+  // DTE (20)
+  if (dte2earn <= 0) {
+    if (c.dte >= 14 && c.dte <= 30) { score += 18; positives.push('Good DTE — pure directional play'); }
+    else if (c.dte < 14) { score += 8; flags.push('Short DTE — high theta risk'); }
+    else { score += 12; }
+  } else {
+    if (dteAfter < 0) { flags.push('EXPIRES BEFORE EARNINGS — misses catalyst'); }
+    else if (dteAfter >= 7 && dteAfter <= 21) { score += 20; positives.push(`+${dteAfter}d after earnings — ideal buffer`); }
+    else if (dteAfter >= 3 && dteAfter < 7) { score += 14; flags.push('Tight post-earnings window'); }
+    else if (dteAfter > 21 && dteAfter <= 45) { score += 12; flags.push('Long buffer — extra theta cost'); }
+    else if (dteAfter > 45) { score += 7; flags.push('Very long DTE — vega benefit diluted'); }
+  }
+
+  // Vega/Theta (20)
+  if (vt >= 2.0) { score += 20; positives.push(`Vega/Theta ${vt.toFixed(2)} — IV expansion dominates`); }
+  else if (vt >= 1.5) { score += 16; positives.push(`Vega/Theta ${vt.toFixed(2)} — favorable`); }
+  else if (vt >= 1.0) { score += 11; flags.push(`Vega/Theta ${vt.toFixed(2)} — borderline`); }
+  else if (vt >= 0.7) { score += 5; flags.push(`Vega/Theta ${vt.toFixed(2)} — theta winning`); }
+  else { flags.push(`Vega/Theta ${vt.toFixed(2)} — poor IV play`); }
+
+  // Liquidity (10)
+  let liq = 0;
+  if (c.volume >= 200) liq += 5; else if (c.volume >= 100) liq += 4; else if (c.volume >= 50) liq += 2; else flags.push(`Low volume (${c.volume})`);
+  if (c.oi >= 1000) liq += 5; else if (c.oi >= 500) liq += 4; else if (c.oi >= 200) liq += 2; else flags.push(`Low OI (${c.oi})`);
+  score += liq;
+  if (liq >= 8) positives.push('Strong liquidity');
+
+  // Strike reachability (10)
+  if (earnMove > 0) {
+    const oneSd = price * (earnMove / 100);
+    const dist = c.strike - price;
+    if (dist <= 0) { score += 10; positives.push('ITM strike'); }
+    else if (dist <= oneSd * 0.5) { score += 10; positives.push('Strike within 50% of 1-SD move'); }
+    else if (dist <= oneSd) { score += 7; positives.push('Strike within earnings move range'); }
+    else if (dist <= oneSd * 1.5) { score += 3; flags.push('Strike beyond typical earnings move'); }
+    else { flags.push('Strike far beyond historical move'); }
+  } else {
+    const pct = price > 0 ? ((c.strike - price) / price) * 100 : 0;
+    if (pct < 2) score += 8; else if (pct < 5) score += 6; else if (pct < 10) score += 4; else { score += 2; flags.push(`Strike ${pct.toFixed(1)}% OTM`); }
+  }
+
+  return { score: Math.min(score, 100), flags, positives, spreadPct, ivP, vt, dteAfter };
+}
+
+function runManualAnalysis() {
+  const ticker = (document.getElementById('a-ticker').value || 'TICKER').toUpperCase();
+  const price = parseFloat(document.getElementById('a-price').value) || 0;
+  const dte2earn = parseInt(document.getElementById('a-dte-earn').value) || 0;
+  const earnMove = parseFloat(document.getElementById('a-earn-move').value) || 0;
+  const sentiment = document.getElementById('a-sentiment').value;
+
+  const blocks = document.querySelectorAll('#a-contracts .contract-block');
+  if (!blocks.length) return;
+
+  const labels = ['A','B','C','D'];
+  const contracts = Array.from(blocks).map((b, i) => ({
+    label: labels[i] || String.fromCharCode(65+i),
+    exp: getStr2('.ac-exp', b),
+    dte: getNum('.ac-dte', b),
+    strike: getNum('.ac-strike', b),
+    mark: getNum('.ac-mark', b),
+    bid: getNum('.ac-bid', b),
+    ask: getNum('.ac-ask', b),
+    iv: getNum('.ac-iv', b),
+    ivLow: getNum('.ac-iv-low', b),
+    ivHigh: getNum('.ac-iv-high', b),
+    delta: getNum('.ac-delta', b),
+    theta: getNum('.ac-theta', b),
+    vega: getNum('.ac-vega', b),
+    volume: getNum('.ac-vol', b),
+    oi: getNum('.ac-oi', b),
+  }));
+
+  const scored = contracts.map(c => ({ ...c, ...scoreContract(c, dte2earn, earnMove, price) }));
+  const best = scored.reduce((a, b) => b.score > a.score ? b : a);
+
+  let html = '';
+
+  // Score cards
+  html += `<div class="score-banner fadeup"><div class="score-grid">`;
+  scored.forEach(c => {
+    const col = c.score >= 70 ? 'var(--green)' : c.score >= 45 ? 'var(--yellow)' : 'var(--red)';
+    html += `<div class="score-block">
+      <div class="score-num" style="color:${col}">${c.score}</div>
+      <div class="score-info">
+        <div class="score-contract-name">${ticker} $${c.strike} ${c.exp} — Contract ${c.label}</div>
+        <div class="score-verdict">${c.positives.slice(0,2).join(' · ')}</div>
+      </div>
+    </div>`;
+  });
+
+  const vClass = best.score >= 70 ? 'go' : best.score >= 45 ? 'caution' : 'pass';
+  const vIcon = best.score >= 70 ? '✓' : best.score >= 45 ? '⚠' : '✗';
+  html += `<div class="verdict-banner ${vClass}">
+    ${vIcon} CONTRACT ${best.label} IS ${best.score >= 70 ? 'RECOMMENDED' : best.score >= 45 ? 'MARGINAL — REDUCE SIZE' : 'NOT RECOMMENDED'} (${best.score}/100)\n
+    ${sentiment === 'bullish' ? '↑ Bullish sentiment aligns with call strategy.' : sentiment === 'bearish' ? '↓ Bearish — consider reducing size or spreads.' : '→ Neutral — catalyst-dependent, size conservatively.'}
+    ${dte2earn > 0 ? `\n${dte2earn} days to earnings — pre-earnings IV expansion window.` : '\nNo earnings event — pure directional play.'}
+  </div>`;
+  html += `</div></div>`;
+
+  // Comparison table (if >1 contract)
+  if (scored.length > 1) {
+    const metrics = [
+      { label: 'SCORE', vals: scored.map(c => ({ v: `${c.score}/100`, col: c.score >= 70 ? 'var(--green)' : c.score >= 45 ? 'var(--yellow)' : 'var(--red)' })), best: scored.indexOf(scored.reduce((a,b) => b.score>a.score?b:a, scored[0])) },
+      { label: 'MARK', vals: scored.map(c => ({ v: `$${c.mark.toFixed(2)}`, col: 'var(--text)' })), best: scored.indexOf(scored.reduce((a,b) => b.mark<a.mark?b:a, scored[0])) },
+      { label: 'SPREAD %', vals: scored.map(c => ({ v: `${c.spreadPct.toFixed(1)}%`, col: c.spreadPct < 5 ? 'var(--green)' : c.spreadPct < 10 ? 'var(--yellow)' : 'var(--red)' })), best: scored.indexOf(scored.reduce((a,b) => b.spreadPct<a.spreadPct?b:a, scored[0])) },
+      { label: 'IV PCT', vals: scored.map(c => ({ v: `${c.ivP}%`, col: c.ivP < 40 ? 'var(--green)' : c.ivP < 65 ? 'var(--yellow)' : 'var(--red)' })), best: scored.indexOf(scored.reduce((a,b) => b.ivP<a.ivP?b:a, scored[0])) },
+      { label: 'V/T RATIO', vals: scored.map(c => ({ v: c.vt.toFixed(2), col: c.vt >= 1.5 ? 'var(--green)' : c.vt >= 1.0 ? 'var(--yellow)' : 'var(--red)' })), best: scored.indexOf(scored.reduce((a,b) => b.vt>a.vt?b:a, scored[0])) },
+    ];
+
+    html += `<div class="compare-table fadeup">`;
+    html += `<div class="compare-row header" style="grid-template-columns: 100px ${scored.map(() => '1fr').join(' ')}"><span>METRIC</span>${scored.map(c => `<span style="text-align:center">CTR ${c.label}</span>`).join('')}</div>`;
+    metrics.forEach(m => {
+      html += `<div class="compare-row" style="grid-template-columns: 100px ${scored.map(() => '1fr').join(' ')}">
+        <span class="compare-label">${m.label}</span>
+        ${m.vals.map((v, i) => `<span class="compare-val" style="color:${v.col}">${v.v}${i === m.best ? ' ★' : ''}</span>`).join('')}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Per-contract detail
+  scored.forEach(c => {
+    const col = c.score >= 70 ? 'var(--green)' : c.score >= 45 ? 'var(--yellow)' : 'var(--red)';
+    html += `<div class="card fadeup">
+      <div class="card-header"><span class="card-title" style="color:${col}">${ticker} $${c.strike} ${c.exp} — Contract ${c.label}</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+        <div class="factor-grid">
+          <div class="factor-card full">
+            <div class="factor-card-label">IV POSITION IN 52-WEEK RANGE</div>
+            <div class="iv-bar-wrap"><div class="iv-needle" style="left:${c.ivP}%"></div></div>
+            <div class="iv-bar-labels"><span>${c.ivLow}%</span><span style="color:var(--cyan)">CURRENT: ${c.iv}% (${c.ivP}th pct)</span><span>${c.ivHigh}%</span></div>
+          </div>
+          <div class="factor-card">
+            <div class="factor-card-label">SPREAD</div>
+            <div class="factor-card-val" style="color:${c.spreadPct < 5 ? 'var(--green)' : c.spreadPct < 10 ? 'var(--yellow)' : 'var(--red)'}">${c.spreadPct.toFixed(1)}%</div>
+            <div class="factor-card-note">${c.spreadPct < 5 ? 'Market order ok' : c.spreadPct < 15 ? 'Use limit at mark' : 'Limit at bid'}</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(c.spreadPct*4,100)}%;background:${c.spreadPct < 5 ? 'var(--green)' : c.spreadPct < 10 ? 'var(--yellow)' : 'var(--red)'}"></div></div>
+          </div>
+          <div class="factor-card">
+            <div class="factor-card-label">VEGA/THETA</div>
+            <div class="factor-card-val" style="color:${c.vt >= 1.5 ? 'var(--green)' : c.vt >= 1.0 ? 'var(--yellow)' : 'var(--red)'}">${c.vt.toFixed(2)}</div>
+            <div class="factor-card-note">${c.vt >= 1.5 ? 'IV expansion wins' : c.vt >= 1.0 ? 'Borderline' : 'Theta winning'}</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(c.vt/3*100,100)}%;background:${c.vt >= 1.5 ? 'var(--green)' : c.vt >= 1.0 ? 'var(--yellow)' : 'var(--red)'}"></div></div>
+          </div>
+        </div>
+        ${c.flags.length ? `
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--red);margin-bottom:6px">⚠ FLAGS</div>
+          ${c.flags.map(f => `<div class="flag-item" style="color:var(--red)"><span>→</span><span>${f}</span></div>`).join('')}
+        </div>` : ''}
+        ${c.positives.length ? `
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--green);margin-bottom:6px">✓ POSITIVES</div>
+          ${c.positives.map(p => `<div class="flag-item" style="color:var(--green)"><span>✓</span><span>${p}</span></div>`).join('')}
+        </div>` : ''}
+        <div style="background:var(--s2);border-radius:6px;padding:12px;font-family:var(--mono);font-size:11px;line-height:2">
+          <div>Max risk (1 contract): <span style="color:var(--red)">$${(c.ask*100).toFixed(0)}</span></div>
+          <div>Stop loss at -50%: <span style="color:var(--red)">$${(c.ask*50).toFixed(0)}</span></div>
+          <div>Target +75% exit: <span style="color:var(--green)">$${(c.ask*175).toFixed(0)}</span></div>
+          <div>Breakeven at expiry: <span style="color:var(--text)">$${(c.strike + c.ask).toFixed(2)}</span></div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  const resultEl = document.getElementById('a-results');
+  resultEl.innerHTML = html;
+  resultEl.classList.add('show');
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+
+</body>
+</html>
