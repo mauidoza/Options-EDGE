@@ -94,7 +94,7 @@ body::after {
 /* ===== TAB BAR ===== */
 .tab-bar {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   border-bottom: 1px solid var(--border);
   background: var(--s1);
   position: sticky;
@@ -1027,6 +1027,261 @@ body::after {
 
 /* Horizontal scroll for wide tables */
 .hscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* =================== CRASH WATCH =================== */
+.crash-wrap {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.crash-gauge {
+  position: relative;
+  padding: 24px 16px 20px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--s2), var(--s1));
+}
+
+.crash-gauge-zone {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.crash-gauge-score {
+  font-family: var(--display);
+  font-size: 84px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -3px;
+}
+.crash-gauge-score.GREEN  { color: var(--green); text-shadow: 0 0 30px var(--green-dim); }
+.crash-gauge-score.YELLOW { color: var(--yellow); text-shadow: 0 0 30px var(--yellow-dim); }
+.crash-gauge-score.ORANGE { color: var(--accent); text-shadow: 0 0 30px var(--accent-dim); }
+.crash-gauge-score.RED    { color: var(--red); text-shadow: 0 0 30px var(--red-dim); }
+
+.crash-gauge-score-suffix {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--muted);
+  margin-left: 4px;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
+.crash-traffic {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+.crash-light {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--s3);
+  border: 1px solid var(--border2);
+  opacity: 0.35;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+.crash-light.active { opacity: 1; }
+.crash-light.GREEN.active  { background: var(--green); box-shadow: 0 0 20px var(--green); }
+.crash-light.YELLOW.active { background: var(--yellow); box-shadow: 0 0 20px var(--yellow); }
+.crash-light.ORANGE.active { background: var(--accent); box-shadow: 0 0 20px var(--accent); }
+.crash-light.RED.active    { background: var(--red); box-shadow: 0 0 20px var(--red); }
+
+.crash-headline {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 0 8px;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.crash-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+
+.crash-bar-track {
+  position: relative;
+  height: 8px;
+  background: var(--s3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 18px 4px 4px;
+}
+.crash-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 35%, var(--accent) 60%, var(--red) 85%);
+  transition: width 0.6s ease;
+}
+.crash-bar-marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 16px;
+  background: var(--text);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.6);
+  transform: translateX(-50%);
+  transition: left 0.6s ease;
+}
+.crash-bar-scale {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+.signal-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.signal-row:last-child { border-bottom: none; }
+
+.signal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.signal-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+.signal-score-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 12px;
+  letter-spacing: 1px;
+}
+.signal-score-pill.GREEN  { background: var(--green-dim); color: var(--green); }
+.signal-score-pill.YELLOW { background: var(--yellow-dim); color: var(--yellow); }
+.signal-score-pill.ORANGE { background: var(--accent-dim); color: var(--accent); }
+.signal-score-pill.RED    { background: var(--red-dim); color: var(--red); }
+
+.signal-note {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.signal-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+}
+.signal-bullets li {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  padding: 2px 0 2px 14px;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+.signal-bullets li::before {
+  content: "·";
+  position: absolute;
+  left: 4px;
+  color: var(--muted2);
+}
+
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.checklist-item:last-child { border-bottom: none; }
+.checklist-box {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--border2);
+  border-radius: 4px;
+  margin-top: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.checklist-box.checked {
+  background: var(--green);
+  border-color: var(--green);
+  position: relative;
+}
+.checklist-box.checked::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.crash-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.crash-empty strong { color: var(--text); display: block; margin-bottom: 8px; font-size: 15px; }
+
+.notify-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.notify-btn {
+  padding: 6px 12px;
+  background: var(--cyan-dim);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.notify-btn:disabled { opacity: 0.5; cursor: default; }
+.notify-status { margin-left: auto; }
+.notify-status.ok { color: var(--green); }
+.notify-status.off { color: var(--muted); }
+.notify-status.err { color: var(--red); }
 </style>
 </head>
 <body>
@@ -1041,8 +1296,9 @@ body::after {
 </div>
 
 <div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('scanner')">⚡ AI SCANNER</button>
+  <button class="tab-btn active" onclick="switchTab('scanner')">⚡ SCANNER</button>
   <button class="tab-btn" onclick="switchTab('analyzer')">📊 ANALYZER</button>
+  <button class="tab-btn" onclick="switchTab('crash')">🚨 CRASH WATCH</button>
 </div>
 
 <!-- =================== SCANNER TAB =================== -->
@@ -1250,6 +1506,71 @@ body::after {
   </div>
   <div class="disclaimer">
     ⚠ OPTIONS TRADING INVOLVES SUBSTANTIAL RISK OF LOSS. FOR EDUCATIONAL PURPOSES ONLY.
+  </div>
+  <div class="safe-spacer"></div>
+</div>
+
+<!-- =================== CRASH WATCH TAB =================== -->
+<div id="tab-crash" class="tab-content">
+  <div class="crash-wrap">
+
+    <!-- Notification permission row -->
+    <div class="notify-row">
+      <span>BROWSER ALERTS</span>
+      <button class="notify-btn" id="notify-enable" onclick="enableCrashNotifications()">ENABLE</button>
+      <span class="notify-status off" id="notify-status">OFF</span>
+    </div>
+
+    <!-- Risk gauge card -->
+    <div class="card">
+      <div class="crash-gauge" id="crash-gauge">
+        <div class="crash-gauge-zone" id="crash-zone-label">— LOADING —</div>
+        <div>
+          <span class="crash-gauge-score" id="crash-score">—</span><span class="crash-gauge-score-suffix">/100</span>
+        </div>
+        <div class="crash-traffic" id="crash-traffic">
+          <div class="crash-light GREEN"></div>
+          <div class="crash-light YELLOW"></div>
+          <div class="crash-light ORANGE"></div>
+          <div class="crash-light RED"></div>
+        </div>
+        <div class="crash-headline" id="crash-headline">Awaiting first weekly report…</div>
+        <div class="crash-bar-track">
+          <div class="crash-bar-fill" id="crash-bar-fill" style="width:0%"></div>
+          <div class="crash-bar-marker" id="crash-bar-marker" style="left:0%"></div>
+        </div>
+        <div class="crash-bar-scale">
+          <span>0 calm</span><span>30</span><span>50</span><span>70</span><span>100 panic</span>
+        </div>
+        <div class="crash-meta" id="crash-meta">No report yet</div>
+      </div>
+    </div>
+
+    <!-- Signals breakdown -->
+    <div class="card" id="crash-signals-card" style="display:none">
+      <div class="card-header"><span class="card-title">SIGNAL BREAKDOWN</span></div>
+      <div class="card-body" id="crash-signals"></div>
+    </div>
+
+    <!-- Exit checklist -->
+    <div class="card" id="crash-checklist-card" style="display:none">
+      <div class="card-header"><span class="card-title">EXIT CHECKLIST</span></div>
+      <div class="card-body" id="crash-checklist"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="crash-empty" id="crash-empty" style="display:none">
+      <strong>No report yet</strong>
+      The weekly Crash Watch runs Monday pre-market and writes <code>bot/report.json</code>.
+      See <code>bot/README.md</code> for setup. To run locally:
+      <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--cyan)">
+        python bot/analyze.py
+      </div>
+    </div>
+
+  </div>
+  <div class="disclaimer">
+    ⚠ NOT FINANCIAL ADVICE. RISK SCORE IS A HEURISTIC, NOT A FORECAST. ALWAYS COMBINE WITH YOUR OWN JUDGMENT.
   </div>
   <div class="safe-spacer"></div>
 </div>
@@ -1826,6 +2147,199 @@ function runManualAnalysis() {
   resultEl.classList.add('show');
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+// =================== CRASH WATCH ===================
+const CRASH_REPORT_URL = 'bot/report.json';
+const CRASH_LAST_KEY = 'crashWatch:lastSeen';
+
+function zoneFromScore(s) {
+  if (s < 30) return 'GREEN';
+  if (s < 50) return 'YELLOW';
+  if (s < 70) return 'ORANGE';
+  return 'RED';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function renderCrashReport(report) {
+  const empty = document.getElementById('crash-empty');
+  if (!report) {
+    empty.style.display = 'block';
+    document.getElementById('crash-zone-label').textContent = '— NO DATA —';
+    document.getElementById('crash-headline').textContent =
+      'Run python bot/analyze.py or enable the GitHub Action.';
+    document.getElementById('crash-meta').textContent = 'NO REPORT FOUND';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const zone = report.zone || zoneFromScore(report.risk_score || 0);
+  const score = report.risk_score ?? 0;
+
+  // Gauge
+  const scoreEl = document.getElementById('crash-score');
+  scoreEl.textContent = score;
+  scoreEl.className = 'crash-gauge-score ' + zone;
+  document.getElementById('crash-zone-label').textContent = '◆ ' + zone + ' ZONE ◆';
+  document.getElementById('crash-headline').textContent = report.headline || '';
+  document.getElementById('crash-bar-fill').style.width = score + '%';
+  document.getElementById('crash-bar-marker').style.left = score + '%';
+
+  const fmt = new Date(report.generated_at || Date.now());
+  document.getElementById('crash-meta').textContent =
+    'REPORT ' + (report.date || fmt.toISOString().slice(0,10)) +
+    ' · UPDATED ' + fmt.toLocaleString();
+
+  // Traffic light
+  document.querySelectorAll('#crash-traffic .crash-light').forEach(el => {
+    el.classList.toggle('active', el.classList.contains(zone));
+  });
+
+  // Signals
+  const signalsCard = document.getElementById('crash-signals-card');
+  const signalsBody = document.getElementById('crash-signals');
+  if (report.signals && report.signals.length) {
+    signalsCard.style.display = 'block';
+    signalsBody.innerHTML = report.signals.map(s => {
+      const z = zoneFromScore(s.score);
+      const bullets = (s.bullets || []).map(b =>
+        `<li>${escapeHtml(b)}</li>`).join('');
+      return `<div class="signal-row">
+        <div class="signal-head">
+          <span class="signal-name">${escapeHtml(s.name.replace(/_/g,' '))}</span>
+          <span class="signal-score-pill ${z}">${s.score}/100</span>
+        </div>
+        <div class="signal-note">${escapeHtml(s.note || '')}</div>
+        ${bullets ? `<ul class="signal-bullets">${bullets}</ul>` : ''}
+      </div>`;
+    }).join('');
+  } else {
+    signalsCard.style.display = 'none';
+  }
+
+  // Exit checklist (persist checked state per-report-date in localStorage)
+  const checklistCard = document.getElementById('crash-checklist-card');
+  const checklistBody = document.getElementById('crash-checklist');
+  if (report.exit_checklist && report.exit_checklist.length) {
+    checklistCard.style.display = 'block';
+    const key = 'crashWatch:check:' + (report.date || 'latest');
+    let checked = {};
+    try { checked = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+    checklistBody.innerHTML = report.exit_checklist.map((c, i) => `
+      <div class="checklist-item" data-idx="${i}">
+        <div class="checklist-box ${checked[i] ? 'checked' : ''}" onclick="toggleCrashCheck('${key}', ${i}, this)"></div>
+        <div>${escapeHtml(c)}</div>
+      </div>
+    `).join('');
+  } else {
+    checklistCard.style.display = 'none';
+  }
+}
+
+function toggleCrashCheck(key, idx, el) {
+  el.classList.toggle('checked');
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+  state[idx] = el.classList.contains('checked');
+  localStorage.setItem(key, JSON.stringify(state));
+}
+
+async function loadCrashReport() {
+  try {
+    const r = await fetch(CRASH_REPORT_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const report = await r.json();
+    renderCrashReport(report);
+    maybeFireNotification(report);
+    return report;
+  } catch (e) {
+    console.warn('Crash report load failed:', e);
+    renderCrashReport(null);
+    return null;
+  }
+}
+
+function maybeFireNotification(report) {
+  if (!report) return;
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission !== 'granted') return;
+
+  const lastSeen = localStorage.getItem(CRASH_LAST_KEY);
+  const fingerprint = (report.date || '') + ':' + (report.zone || '') + ':' + (report.risk_score || '');
+  if (lastSeen === fingerprint) return;
+
+  // Notify on YELLOW+ or any zone change
+  const elevated = report.zone && report.zone !== 'GREEN';
+  if (elevated) {
+    try {
+      const n = new Notification('Crash Watch — ' + report.zone, {
+        body: report.headline || `Risk ${report.risk_score}/100`,
+        tag: 'crash-watch',
+        requireInteraction: report.zone === 'RED',
+      });
+      n.onclick = () => { window.focus(); switchTabByName('crash'); };
+    } catch (e) { console.warn(e); }
+  }
+  localStorage.setItem(CRASH_LAST_KEY, fingerprint);
+}
+
+function updateNotifyStatus() {
+  const el = document.getElementById('notify-status');
+  const btn = document.getElementById('notify-enable');
+  if (typeof Notification === 'undefined') {
+    el.textContent = 'UNSUPPORTED';
+    el.className = 'notify-status err';
+    btn.disabled = true;
+    return;
+  }
+  const p = Notification.permission;
+  if (p === 'granted') {
+    el.textContent = 'ON';
+    el.className = 'notify-status ok';
+    btn.disabled = true;
+    btn.textContent = 'ENABLED';
+  } else if (p === 'denied') {
+    el.textContent = 'BLOCKED';
+    el.className = 'notify-status err';
+    btn.disabled = true;
+  } else {
+    el.textContent = 'OFF';
+    el.className = 'notify-status off';
+  }
+}
+
+async function enableCrashNotifications() {
+  if (typeof Notification === 'undefined') return;
+  const p = await Notification.requestPermission();
+  updateNotifyStatus();
+  if (p === 'granted') {
+    new Notification('Crash Watch armed', {
+      body: 'You\'ll be notified when risk crosses YELLOW or above.',
+      tag: 'crash-watch-armed',
+    });
+  }
+}
+
+function switchTabByName(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const btn = Array.from(document.querySelectorAll('.tab-btn'))
+    .find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${name}'`));
+  if (btn) btn.classList.add('active');
+}
+
+// Init crash watch on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateNotifyStatus();
+  loadCrashReport();
+  // Re-check every 10 minutes while tab is open
+  setInterval(loadCrashReport, 10 * 60 * 1000);
+});
 </script>
 
 </body>

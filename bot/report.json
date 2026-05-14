@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-14T00:00:00+00:00",
+  "date": "2026-05-14",
+  "risk_score": 0,
+  "zone": "GREEN",
+  "headline": "Awaiting first Monday run. Trigger the GitHub Action manually or run `python bot/analyze.py` locally to populate.",
+  "signals": [],
+  "weights": {
+    "price_trend": 0.20,
+    "vix": 0.20,
+    "yield_curve": 0.15,
+    "credit_breadth": 0.15,
+    "futures": 0.05,
+    "news": 0.25
+  },
+  "exit_checklist": []
+}

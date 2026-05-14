@@ -1,0 +1,63 @@
+name: Crash Watch
+
+on:
+  schedule:
+    # Mondays at 12:30 UTC = 7:30am ET (one hour before US cash open).
+    # GitHub cron uses UTC and may be delayed a few minutes during peak hours.
+    - cron: "30 12 * * 1"
+  workflow_dispatch:
+    inputs:
+      always_notify:
+        description: "Send notifications even if zone is GREEN"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crash-watch
+  cancel-in-progress: false
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: bot/requirements.txt
+
+      - name: Install deps
+        run: pip install -r bot/requirements.txt
+
+      - name: Run analyzer
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          SMTP_TO: ${{ secrets.SMTP_TO }}
+          ALWAYS_NOTIFY: ${{ inputs.always_notify && '1' || '' }}
+        run: python bot/analyze.py
+
+      - name: Commit updated report
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain bot/report.json bot/report.md)" ]]; then
+            git add bot/report.json bot/report.md
+            git commit -m "chore(bot): weekly market crash-watch report"
+            git push
+          else
+            echo "No changes to report."
+          fi
